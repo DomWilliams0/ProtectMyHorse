@@ -1,4 +1,4 @@
-![ProtectMyHorse]
+[ProtectMyHorse]
 ==========
 
 A horse protection plugin for Bukkit.
@@ -8,4 +8,3 @@ Links
 -----
 
 * [Wiki](http://wiki.supaham.com/wiki/ProtectMyHorse)
-=======
