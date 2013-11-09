@@ -1,0 +1,8 @@
+price-to-lock: 10
+price-to-unlock: 10
+spawn-firework: true
+enabled-worlds:
+- world
+- world_nether
+- world_the_end
+must-tame-horse: true

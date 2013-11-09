@@ -1,0 +1,6 @@
+name: ProtectMyHorse
+main: ${mainClass}
+version: ${project.version}
+softdepend: [Vault]
+author: SupaHam
+website: http://www.supaham.com
