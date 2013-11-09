@@ -93,11 +93,11 @@ public class ProtectMyHorse extends JavaPlugin {
     /**
      * Loads the dependencies.
      */
-    public void loadDependencies() throws FailedToLoadException {
+    public void loadDependencies(){
 
         Plugin vault = getServer().getPluginManager().getPlugin("Vault");
         if (vault == null) {
-            throw new FailedToLoadException("Please download Vault");
+            getLogger().warning("Vault could not be found, please install it to enable better permission handling and economy.");
         } else {
             RegisteredServiceProvider<Permission> permProv =
                     getServer().getServicesManager().getRegistration(Permission.class);
@@ -110,7 +110,7 @@ public class ProtectMyHorse extends JavaPlugin {
             if (economyProvider != null) {
                 economy = economyProvider.getProvider();
             } else {
-                throw new FailedToLoadException("Economy plugin not found!");
+                getLogger().warning("Economy plugin not found, please install one to be able to charge players.");
             }
         }
     }
