@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.Horse;
@@ -24,6 +25,7 @@ import com.supaham.protectmyhorse.configuration.ConfigHandler;
 import com.supaham.protectmyhorse.protection.ProtectedHorse;
 import com.supaham.protectmyhorse.protection.ProtectedHorse.Type;
 import com.supaham.protectmyhorse.protection.ProtectionManager;
+import com.supaham.protectmyhorse.util.FireworkUtil;
 
 public class PMHListener implements Listener {
 
@@ -78,6 +80,7 @@ public class PMHListener implements Listener {
         String uuid = horse.getUniqueId().toString();
         if (action instanceof Lock) {
             handleActionLock(uuid, mgr, player);
+            spawnFirework(evt.getRightClicked().getLocation());
         } else if (action instanceof Unlock) {
             handleActionUnlock(uuid, mgr, player);
         } else if (action instanceof Add) {
@@ -327,6 +330,13 @@ public class PMHListener implements Listener {
         if (horse != null && !horse.canRide(evt.getPlayer())) {
             evt.getPlayer().sendMessage(ChatColor.RED + "You can not ride that horse!");
             evt.setCancelled(true);
+        }
+    }
+
+    private void spawnFirework(Location location) {
+
+        if(plugin.getConfigHandler().getBoolean(ConfigHandler.SPAWN_FIREWORK)){
+            FireworkUtil.getRandomFirework(location);
         }
     }
 
