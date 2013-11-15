@@ -5,7 +5,7 @@
   <artifactId>protectmyhorse</artifactId>
   <name>ProtectMyHorse</name>
   <version>0.1-SNAPSHOT</version>
-  <description>A horse protection plugin for Bukkit</description>
+  <description>A horse protection plugin for Bukkit.</description>
   <build>
     <sourceDirectory>${basedir}/src/main/java/</sourceDirectory>
     <defaultGoal>install</defaultGoal>
