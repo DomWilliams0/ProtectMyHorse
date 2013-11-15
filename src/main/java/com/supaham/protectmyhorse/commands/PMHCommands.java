@@ -72,7 +72,7 @@ public class PMHCommands {
     }
 
     @Command(aliases = { "add", "a" },
-            desc = "Adds a player to the player list of a horse.",
+            desc = "Sets the player in an adding player state.",
             usage = "<player>",
             min = 1,
             max = 1)
@@ -99,7 +99,7 @@ public class PMHCommands {
     }
 
     @Command(aliases = { "remove", "rm", "r" },
-            desc = "Removes a player from the player list of a horse.",
+            desc = "Sets the player in a removing player state.",
             usage = "<player>",
             min = 1,
             max = 1)
@@ -127,7 +127,7 @@ public class PMHCommands {
     }
 
     @Command(aliases = { "type", "t" },
-            desc = "Changes the type of a protected horse.",
+            desc = "Sets the player in a horse type change state.",
             usage = "<whitelist/blacklist>",
             min = 1,
             max = 1)
@@ -163,7 +163,7 @@ public class PMHCommands {
     }
 
     @Command(aliases = { "info", "i" },
-            desc = "Displays info about a horse",
+            desc = "Sets the player in a horse information state.",
             min = 0,
             max = 0)
     public static void info(CommandContext args, CommandSender sender)
