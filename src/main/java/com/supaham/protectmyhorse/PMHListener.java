@@ -98,7 +98,7 @@ public class PMHListener implements Listener {
 
     /**
      * Handles {@code player} locking a horse.
-     *
+     * 
      * @param uuid uuid of the horse
      * @param mgr {@link ProtectionManager}
      * @param player player locking the horse
@@ -344,7 +344,7 @@ public class PMHListener implements Listener {
 
     private void spawnFirework(Location location) {
 
-        if(plugin.getConfigHandler().getBoolean(ConfigHandler.SPAWN_FIREWORK)){
+        if (plugin.getConfigHandler().getBoolean(ConfigHandler.SPAWN_FIREWORK)) {
             FireworkUtil.getRandomFirework(location);
         }
     }
