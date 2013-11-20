@@ -1,0 +1,5 @@
+0.1:
+- Initial release
+1.0:
+- Added fireworks upon locking a horse (configurable)
+- The type permission has been changed to type.<type> where <type> is the type they should be allowed to use.
