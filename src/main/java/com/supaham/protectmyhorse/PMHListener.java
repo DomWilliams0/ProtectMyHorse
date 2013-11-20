@@ -79,8 +79,9 @@ public class PMHListener implements Listener {
 
         String uuid = horse.getUniqueId().toString();
         if (action instanceof Lock) {
-            handleActionLock(uuid, mgr, player);
-            spawnFirework(evt.getRightClicked().getLocation());
+            if (handleActionLock(uuid, mgr, player)) {
+                spawnFirework(evt.getRightClicked().getLocation());
+            }
         } else if (action instanceof Unlock) {
             handleActionUnlock(uuid, mgr, player);
         } else if (action instanceof Add) {
@@ -95,10 +96,18 @@ public class PMHListener implements Listener {
         }
     }
 
-    private void handleActionLock(String uuid, ProtectionManager mgr, Player player) {
+    /**
+     * Handles {@code player} locking a horse.
+     *
+     * @param uuid uuid of the horse
+     * @param mgr {@link ProtectionManager}
+     * @param player player locking the horse
+     * @return true if the horse has successfully been locked, otherwise false
+     */
+    private boolean handleActionLock(String uuid, ProtectionManager mgr, Player player) {
 
         if (!plugin.checkPermissions(player, "lock")) {
-            return;
+            return false;
         }
 
         if (mgr.containsHorse(uuid)) {
@@ -112,40 +121,40 @@ public class PMHListener implements Listener {
             else
                 sb.append("owned by someone else.");
             player.sendMessage(sb.toString());
-        } else {
-            int limit = plugin.getLockLimit(player);
-            if (limit > -1) {
-                if (plugin.getPlayerProtectedHorses(player) >= limit) {
-                    player.sendMessage(ChatColor.RED
-                            + "You have reached your limit of horse protection.");
-                    return;
-                }
-            }
-            double price =
-                    plugin.getConfigHandler().getDouble(ConfigHandler.PRICE_TO_LOCK);
-            if (price > 0) {
-                if (!plugin.hasBalance(player.getName(), price)) {
-                    double missing =
-                            price - plugin.getEconomy().getBalance(player.getName());
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(ChatColor.RED);
-                    sb.append("You can not afford to protect this horse, you need ");
-                    sb.append(missing + " more ");
-                    sb.append(getCurrencyName(missing, false));
-                    sb.append(".");
-                    player.sendMessage(sb.toString());
-                    return;
-                }
-                if (plugin.withdraw(player.getName(), price)) {
-                    player.sendMessage(ChatColor.GREEN.toString() + price + " "
-                            + ChatColor.YELLOW + getCurrencyName(price, true)
-                            + " deducted from your balance.");
-                }
-            }
-            mgr.addHorse(uuid, new ProtectedHorse(player.getName()));
-            player.sendMessage(ChatColor.YELLOW
-                    + "You successfully protected that horse!");
+            return false;
         }
+
+        int limit = plugin.getLockLimit(player);
+        if (limit > -1) {
+            if (plugin.getPlayerProtectedHorses(player) >= limit) {
+                player.sendMessage(ChatColor.RED
+                        + "You have reached your limit of horse protection.");
+                return false;
+            }
+        }
+        double price = plugin.getConfigHandler().getDouble(ConfigHandler.PRICE_TO_LOCK);
+        if (price > 0) {
+            if (!plugin.hasBalance(player.getName(), price)) {
+                double missing =
+                        price - plugin.getEconomy().getBalance(player.getName());
+                StringBuilder sb = new StringBuilder();
+                sb.append(ChatColor.RED);
+                sb.append("You can not afford to protect this horse, you need ");
+                sb.append(missing + " more ");
+                sb.append(getCurrencyName(missing, false));
+                sb.append(".");
+                player.sendMessage(sb.toString());
+                return false;
+            }
+            if (plugin.withdraw(player.getName(), price)) {
+                player.sendMessage(ChatColor.GREEN.toString() + price + " "
+                        + ChatColor.YELLOW + getCurrencyName(price, true)
+                        + " deducted from your balance.");
+            }
+        }
+        mgr.addHorse(uuid, new ProtectedHorse(player.getName()));
+        player.sendMessage(ChatColor.YELLOW + "You successfully protected that horse!");
+        return true;
     }
 
     private void handleActionUnlock(String uuid, ProtectionManager mgr, Player player) {
