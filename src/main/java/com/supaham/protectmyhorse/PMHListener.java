@@ -267,7 +267,7 @@ public class PMHListener implements Listener {
             Player player,
             Type type) {
 
-        if (!plugin.checkPermissions(player, "type")) {
+        if (!plugin.checkPermissions(player, "type." + type.toString())) {
             return;
         }
 
