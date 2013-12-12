@@ -29,6 +29,22 @@ import com.supaham.protectmyhorse.util.FireworkUtil;
 
 public class PMHListener implements Listener {
 
+   private static final Set<PotionEffectType> HARMFUL_POTIONS;
+
+    static {
+        HARMFUL_POTIONS = new HashSet<>();
+        HARMFUL_POTIONS.add(PotionEffectType.HARM);
+        HARMFUL_POTIONS.add(PotionEffectType.POISON);
+        HARMFUL_POTIONS.add(PotionEffectType.SLOW);
+        HARMFUL_POTIONS.add(PotionEffectType.WEAKNESS);
+        HARMFUL_POTIONS.add(PotionEffectType.SLOW_DIGGING);
+        HARMFUL_POTIONS.add(PotionEffectType.BLINDNESS);
+        HARMFUL_POTIONS.add(PotionEffectType.CONFUSION);
+        HARMFUL_POTIONS.add(PotionEffectType.HUNGER);
+        HARMFUL_POTIONS.add(PotionEffectType.WITHER);
+    }
+
+
     private ProtectMyHorse plugin;
     private Map<String, Action> actingPlayers;
 
@@ -36,6 +52,108 @@ public class PMHListener implements Listener {
 
         this.plugin = instance;
         this.actingPlayers = new HashMap<>();
+    }
+
+    @EventHandler
+    public void onInteractWithHorse(PlayerInteractEntityEvent evt) {
+
+        if (evt.getRightClicked() instanceof Horse) {
+            World world = evt.getRightClicked().getWorld();
+            ProtectionManager mgr = plugin.getGlobalManager().getProtectionManager(world.getName());
+            Player player = evt.getPlayer();
+            if (mgr != null) {
+                if (contains(player)) {
+                    handleInteraction(evt, mgr);
+                    evt.setCancelled(true);
+                } else {
+                    handleRiding(evt, mgr);
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onHorseDamage(EntityDamageEvent evt) {
+        if (!(evt.getEntity() instanceof Horse))
+            return;
+
+        ProtectionManager mgr = plugin.getGlobalManager().getProtectionManager(evt.getEntity().getWorld().getName());
+        if (mgr == null)
+            return;
+
+        ProtectedHorse horse = mgr.getProtectedHorse(evt.getEntity().getUniqueId().toString());
+
+        if (horse == null)
+            return;
+
+
+        // block possible player inflicted damage
+        if (evt instanceof EntityDamageByEntityEvent) {
+            EntityDamageByEntityEvent event = (EntityDamageByEntityEvent) evt;
+
+            Player damager;
+
+            // melee
+            if (event.getDamager() instanceof Player)
+                damager = (Player) event.getDamager();
+            else if (event.getDamager() instanceof Projectile) {
+                // projectile
+                Projectile p = (Projectile) event.getDamager();
+                if (!(p.getShooter() instanceof Player))
+                    return;
+                else
+                    damager = (Player) p.getShooter();
+            } else
+                return; // wasn't melee or projectile
+
+            // check player
+            if (!horse.canRide(damager)) {
+                evt.setCancelled(true);
+                damager.sendMessage(ChatColor.RED + "You can't attack that horse!");
+                damager.damage(0D); // slap
+            }
+
+        }
+
+        // block all other damage regardless
+        else
+            evt.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onPotion(PotionSplashEvent event) {
+        // is potion harmful
+        if (!isHarmfulPotion(event.getPotion()))
+            return;
+
+        ProtectionManager mgr = plugin.getGlobalManager().getProtectionManager(event.getPotion().getWorld().getName());
+        if (mgr == null)
+            return;
+
+        for (Iterator<LivingEntity> iterator = event.getAffectedEntities().iterator(); iterator.hasNext(); ) {
+            LivingEntity e = iterator.next();
+            if (e.getType() == EntityType.HORSE) {
+                ProtectedHorse horse = mgr.getProtectedHorse(e.getUniqueId().toString());
+                if (horse == null)
+                    return;
+
+                if (event.getPotion().getShooter() instanceof Player) {
+                    Player p = (Player) event.getPotion().getShooter();
+                    if (!horse.canRide(p)) // cancel if potion thrower doesn't have access to horse
+                        iterator.remove();
+                }
+
+            }
+
+        }
+
+    }
+
+    private boolean isHarmfulPotion(ThrownPotion thrownPotion) {
+        for (PotionEffect e : thrownPotion.getEffects())
+            if (HARMFUL_POTIONS.contains(e.getType()))
+                return true;
+        return false;
     }
 
     @EventHandler
