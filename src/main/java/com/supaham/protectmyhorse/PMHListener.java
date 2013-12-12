@@ -55,24 +55,6 @@ public class PMHListener implements Listener {
     }
 
     @EventHandler
-    public void onInteractWithHorse(PlayerInteractEntityEvent evt) {
-
-        if (evt.getRightClicked() instanceof Horse) {
-            World world = evt.getRightClicked().getWorld();
-            ProtectionManager mgr = plugin.getGlobalManager().getProtectionManager(world.getName());
-            Player player = evt.getPlayer();
-            if (mgr != null) {
-                if (contains(player)) {
-                    handleInteraction(evt, mgr);
-                    evt.setCancelled(true);
-                } else {
-                    handleRiding(evt, mgr);
-                }
-            }
-        }
-    }
-
-    @EventHandler
     public void onHorseDamage(EntityDamageEvent evt) {
         if (!(evt.getEntity() instanceof Horse))
             return;
